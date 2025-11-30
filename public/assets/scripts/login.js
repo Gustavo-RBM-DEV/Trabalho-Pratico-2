@@ -1,9 +1,9 @@
-// URL base do JSON Server
+
 const API_URL = 'http://localhost:3000';
 
 /**
- * Função utilitária para gerar um UUID (Identificador Único Universal) simples
- * @returns {string} Um novo UUID.
+ * 
+ * @returns {string} 
  */
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -12,9 +12,6 @@ function uuidv4() {
   });
 }
 
-/**
- * Realiza o login do usuário.
- */
 async function handleLogin(event) {
   event.preventDefault();
   const login = document.getElementById('login-email').value;
@@ -23,7 +20,6 @@ async function handleLogin(event) {
   feedback.classList.add('d-none');
 
   try {
-    // 1. Buscar usuário por login ou email
     const response = await fetch(`${API_URL}/usuarios?q=${login}`);
     if (!response.ok) throw new Error('Erro ao buscar usuários.');
     
@@ -31,11 +27,9 @@ async function handleLogin(event) {
     const usuario = usuarios.find(u => (u.login === login || u.email === login) && u.senha === senha);
 
     if (usuario) {
-      // 2. Login bem-sucedido: Salvar no sessionStorage e redirecionar
       sessionStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-      window.location.href = 'index.html'; // Redireciona para a Home
+      window.location.href = 'index.html'; 
     } else {
-      // 3. Login falhou
       feedback.textContent = 'Login ou senha inválidos.';
       feedback.classList.remove('d-none');
     }
@@ -47,9 +41,6 @@ async function handleLogin(event) {
   }
 }
 
-/**
- * Realiza o cadastro de um novo usuário.
- */
 async function handleCadastro(event) {
   event.preventDefault();
   const nome = document.getElementById('cadastro-nome').value;
@@ -60,11 +51,11 @@ async function handleCadastro(event) {
   feedback.classList.add('d-none');
 
   try {
-    // 1. Verificar se o login ou email já existem
+   
     const checkResponse = await fetch(`${API_URL}/usuarios?login=${login}&email=${email}`);
     const existingUsers = await checkResponse.json();
     
-    // Verifica se algum usuário já tem o mesmo login OU o mesmo email
+   
     const loginExists = existingUsers.some(u => u.login === login);
     const emailExists = existingUsers.some(u => u.email === email);
 
@@ -80,18 +71,17 @@ async function handleCadastro(event) {
       return;
     }
 
-    // 2. Criar novo objeto de usuário
+
     const novoUsuario = {
       id: uuidv4(),
       nome,
       email,
       login,
       senha,
-      admin: false, // Novos usuários não são administradores por padrão
-      favoritos: [] // Começa sem favoritos
+      admin: false, 
+      favoritos: [] 
     };
 
-    // 3. Enviar para o JSON Server
     const response = await fetch(`${API_URL}/usuarios`, {
       method: 'POST',
       headers: {
@@ -101,7 +91,6 @@ async function handleCadastro(event) {
     });
 
     if (response.ok) {
-      // 4. Cadastro bem-sucedido: Login automático e redirecionamento
       sessionStorage.setItem('usuarioLogado', JSON.stringify(novoUsuario));
       alert('Cadastro realizado com sucesso! Você está logado.');
       window.location.href = 'index.html';
@@ -117,7 +106,6 @@ async function handleCadastro(event) {
   }
 }
 
-// Associa os listeners de evento aos formulários
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) {

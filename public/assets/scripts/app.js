@@ -102,27 +102,27 @@ function renderizarCabecalho() {
 
     navActions.innerHTML = '';
 
-    if (usuarioLogado && usuarioLogado.admin) {
-        navActions.innerHTML += `
-            <a href="admin.html" class="btn btn-outline-warning me-2">Gerenciar Conteúdos</a>
-        `;
-    }
-
     if (usuarioLogado) {
         navActions.innerHTML += `
-            <a href="favoritos.html" class="btn btn-outline-light me-2">Meus Favoritos</a>
             <span class="text-warning me-2 d-none d-md-inline-block">Olá, ${usuarioLogado.login}!</span>
-            <button class="btn btn-warning" onclick="handleLogout()">Logout</button>
+        `;
+
+        if (usuarioLogado.admin) {
+            navActions.innerHTML += `
+                <a href="admin.html" class="btn btn-outline-warning me-2">Gerenciar Conteúdos</a>
+            `;
+        }
+
+        navActions.innerHTML += `
+            <a href="favoritos.html" class="btn btn-outline-danger me-2">Meus Favoritos</a>
+            <a href="estatisticas.html" class="btn btn-outline-info me-2">Estatísticas</a> <button class="btn btn-warning" onclick="handleLogout()">Logout</button>
         `;
     } else {
         navActions.innerHTML += `
-            <a href="login.html" class="btn btn-warning">Login / Cadastro</a>
+            <a href="login.html" class="btn btn-warning me-2">Login / Cadastro</a>
+            <a href="estatisticas.html" class="btn btn-outline-info">Estatísticas</a>
         `;
     }
-    
-    navActions.innerHTML += `
-        <a href="estatisticas.html" class="btn btn-outline-info ms-2">Estatísticas</a>
-    `;
 }
 
 function handleLogout() {
@@ -245,6 +245,29 @@ function renderizarDetalhes(item) {
 
     const favButtonHTML = createFavoriteButton(item, true); 
     const tipo = item.categoria.toLowerCase();
+    let galeriaFotosHTML = '';
+    if (item.fotos && item.fotos.length > 0) {
+        const fotosMiniaturasHTML = item.fotos.map(foto => `
+            <div class="col-md-4 col-6 mb-3">
+                <div class="card bg-dark border-secondary galeria-miniatura-card">
+                    <img src="${foto.imagem}" class="card-img-top galeria-miniatura-img" alt="${foto.titulo}">
+                    <div class="card-footer text-center p-1">
+                        <small class="text-white-50">${foto.titulo}</small>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        galeriaFotosHTML = `
+            <div class="mt-5 pt-3 border-top border-warning">
+                <h4 class="galeria-title">Fotos do Item Associado</h4>
+                <div class="row">
+                    ${fotosMiniaturasHTML}
+                </div>
+            </div>
+        `;
+    }
+
 
     detalhesContainer.innerHTML = `
         <div class="card bg-dark border-warning shadow-lg p-3">
@@ -274,12 +297,11 @@ function renderizarDetalhes(item) {
                             <h4>Conteúdo Completo:</h4>
                             <p>${item.conteudo}</p>
                         </div>
-                        <a href="index.html" class="btn btn-outline-warning mt-auto w-100">← Voltar à Home</a>
                     </div>
                 </div>
             </div>
         </div>
-    `;
+        ${galeriaFotosHTML} `;
 }
 
 function loadAndDisplayFavorites() {
@@ -721,7 +743,6 @@ function iniciarHomePage() {
     carregarDadosGlobais().then(items => {
         renderizarCarrossel(items);
         renderizarCards(items);
-        // CORREÇÃO: Chamadas de estatísticas para a Home Page
         renderizarGraficoCategoriasHome(); 
         renderizarResumoDados();          
     }).catch(error => {

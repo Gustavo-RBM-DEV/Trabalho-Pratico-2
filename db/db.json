@@ -8,7 +8,24 @@
       "categoria": "Console",
       "data": "1977-09-11",
       "imagem": "assets/img/atari2600/atari2600.jpg",
-      "destaque": false
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "atari primeira verção",
+          "imagem": "assets/img/atari2600/atariprimeiraversao.png"
+        },
+        {
+          "id": 2,
+          "titulo": "controle atari",
+          "imagem": "assets/img/atari2600/ataricontrole.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "jogo incluido no lançamento",
+          "imagem": "assets/img/atari2600/jogolançamento.png"
+        }
+      ]
     },
     {
       "id": "102",
@@ -18,69 +35,296 @@
       "categoria": "Console",
       "data": "1983-07-15",
       "imagem": "assets/img/nes/nes.jpg",
-      "destaque": false
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "controle nes",
+          "imagem": "/assets/img/nes/controlenes.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": "Nintendo Zapper",
+          "imagem": "/assets/img/nes/zappernes.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Comparação de NES de diferentes regiões",
+          "imagem": "/assets/img/nes/comparaçaones.jpg"
+        }
+      ]
     },
     {
       "id": "103",
-      "titulo": "Sega Mega Drive / Genesis (1988)",
-      "descricao": "O console que trouxe a guerra dos 16 bits com Sonic the Hedgehog.",
-      "conteudo": "O Mega Drive (Genesis na América do Norte) foi o competidor direto do Super Nintendo. Conhecido por seu processador rápido, jogos de arcade mais fiéis e títulos como Sonic, Streets of Rage e Altered Beast. Sua campanha de marketing agressiva e foco em jogos para um público mais maduro definiram a era de 16 bits.",
+      "titulo": "Sega Master System (1985)",
+      "descricao": "Lançado em 1985, o Sega Master System foi o principal concorrente do NES na era dos 8 bits.",
+      "conteudo": "O **Master System** foi a primeira grande aposta da Sega no mercado de consoles. Embora tenha tido mais sucesso na Europa e no Brasil do que na América do Norte, ele possuía gráficos tecnicamente superiores ao NES e introduziu personagens como *Alex Kidd*. Foi fundamental para iniciar a 'Guerra dos Consoles' com a Nintendo.",
+      "categoria": "Console",
+      "data": "1985-10-20",
+      "imagem": "assets/img/segams/Master-System.jpg",
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Controles do Master System.",
+          "imagem": "/assets/img/segams/controlems.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": "Sega Light Phaser",
+          "imagem": "/assets/img/segams/lightphaserms.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Sega óculos 3D e o adaptador de cartão",
+          "imagem": "/assets/img/segams/oculosms.jpg"
+        }
+      ]
+    },
+    {
+      "id": "104",
+      "titulo": "Sega Genesis (Mega Drive) (1988)",
+      "descricao": "Lançado em 1988, o Sega Genesis, conhecido como Mega Drive fora da América do Norte, foi um console de 16 bits que marcou a transição para gráficos mais avançados e jogabilidade mais complexa.",
+      "conteudo": "O **Mega Drive** marcou a transição para a era dos 16 bits. Sua campanha de marketing agressiva, focada na velocidade e no público adolescente, e a introdução de *Sonic the Hedgehog*, permitiram à Sega competir de igual para igual com o SNES. É lembrado por sua vasta biblioteca de jogos de arcade e RPGs.",
       "categoria": "Console",
       "data": "1988-10-29",
       "imagem": "assets/img/segamd/Mega-Drive.jpg",
-      "destaque": false
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Controlador Genesis de seis botões",
+          "imagem": "/assets/img/segamd/controlemd.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": " Nomad, versão portátil do console.",
+          "imagem": "/assets/img/segamd/nomadmd.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Modelo cartucho",
+          "imagem": "/assets/img/segamd/cartuchomd.jpg"
+        }
+      ]
+    },
+    {
+      "id": "105",
+      "titulo": "Super Nintendo (SNES) (1990)",
+      "descricao": "Console 16-bit conhecido por RPGs e plataformas inesquecíveis.",
+      "conteudo": "O **Mega Drive** marcou a transição para a era dos 16 bits. Sua campanha de marketing agressiva, focada na velocidade e no público adolescente, e a introdução de *Sonic the Hedgehog*, permitiram à Sega competir de igual para igual com o SNES. É lembrado por sua vasta biblioteca de jogos de arcade e RPGs.",
+      "categoria": "Console",
+      "data": "1990-11-21",
+      "imagem": "assets/img/snes/snes.jpg",
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": " Cartucho Super Game Boy",
+          "imagem": "assets/img/snes/cartuchosnes.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": "Controles da versão japonesa (acima) e americana (abaixo).",
+          "imagem": "assets/img/snes/controlesnes.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Super NES Mouse",
+          "imagem": "assets/img/snes/snesmouse.jpg"
+        }
+      ]
     }
   ],
   "jogos": [
     {
       "id": "201",
-      "titulo": "Pac-Man (1980)",
-      "descricao": "O clássico jogo de arcade de labirinto, onde você come pastilhas e foge dos fantasmas.",
-      "conteudo": "Pac-Man é um dos jogos de arcade mais famosos e influentes. Lançado em 1980, sua mecânica simples de comer todos os pontos no labirinto enquanto evita os quatro fantasmas (Blinky, Pinky, Inky e Clyde) é atemporal. É um ícone da cultura pop e um pilar do design de jogos.",
+      "titulo": "Pong (1972)",
+      "descricao": "Um dos primeiros e mais simples jogos eletrônicos.",
+      "conteudo": "Pong é creditado como um dos primeiros jogos de arcade de sucesso comercial. Seu design extremamente simples (duas barras e uma bola) provou que o mercado de jogos eletrônicos era viável. Ele desencadeou a indústria de videogames e inspirou inúmeros jogos de esporte.",
       "categoria": "Jogo",
-      "data": "1980-05-22",
-      "imagem": "assets/img/pacman/pac-man.jpg",
-      "destaque": false
+      "data": "1972-11-29",
+      "imagem": "assets/img/pong/pong.png",
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Máquina Pong",
+          "imagem": "assets/img/pong/pongarcade.png"
+        },
+        {
+          "id": 2,
+          "titulo": "Versão do pong portatil",
+          "imagem": "assets/img/pong/pongdomestico.png"
+        },
+        {
+          "id": 3,
+          "titulo": "Criador do Pong",
+          "imagem": "assets/img/pong/criadorpong1.jpg"
+        }
+      ]
     },
     {
       "id": "202",
-      "titulo": "Tetris (1984)",
-      "descricao": "Um jogo de puzzle viciante sobre encaixar peças que caem.",
-      "conteudo": "Criado na União Soviética, Tetris se tornou um fenômeno global, especialmente após ser empacotado com o Game Boy da Nintendo. Seu design de 'simples de aprender, difícil de dominar' e a natureza viciante de encaixar as formas (tetrominós) o tornam um dos jogos mais vendidos de todos os tempos. Sua simplicidade e genialidade atravessaram gerações.",
+      "titulo": "Space Invaders (1978)",
+      "descricao": "Um clássico de 1978, Space Invaders coloca o jogador no comando de uma nave que deve atirar e destruir hordas de alienígenas.",
+      "conteudo": "Space Invaders** foi um fenômeno cultural global. É um dos primeiros jogos de tiro (shmup) e popularizou o conceito de pontuação alta. Sua demanda por moedas era tão alta que se diz ter causado uma escassez temporária de moedas de 100 ienes no Japão!",
       "categoria": "Jogo",
-      "data": "1984-06-06",
-      "imagem": "assets/img/tetris/tetris.jpg",
-      "destaque": true
+      "data": "1978-06-16",
+      "imagem": "assets/img/spinvaders/space-invaders.jpg",
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Arcade Space Invaders",
+          "imagem": "assets/img/spinvaders/spacearcade.jpeg"
+        },
+        {
+          "id": 2,
+          "titulo": "Criador Space Invaders",
+          "imagem": "assets/img/spinvaders/criadorspace.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Capa do cartucho Space Invaders",
+          "imagem": "assets/img/spinvaders/spacecartucho.jpeg"
+        }
+      ]
     },
     {
       "id": "203",
-      "titulo": "Doom (1993)",
-      "descricao": "O FPS que definiu o gênero e popularizou o multiplayer em rede local.",
-      "conteudo": "Lançado pela id Software em 1993, Doom foi um marco técnico e cultural. Seu uso de gráficos 3D (para a época) e a jogabilidade frenética com elementos de terror e ficção científica revolucionaram os jogos de tiro em primeira pessoa. O modo 'deathmatch' em rede local estabeleceu o multiplayer como conhecemos hoje. Sua influência é vista em quase todo FPS moderno.",
+      "titulo": "Pac-Man (1980)",
+      "descricao": "Jogo de labirinto que virou ícone da cultura pop.",
+      "conteudo": "Pac-Man** (originalmente Puck Man) é um dos jogos de arcade mais vendidos e reconhecidos de todos os tempos. Sua jogabilidade de labirinto, focada em estratégia e evasão, e o apelo do personagem, o transformaram em um ícone pop que transcendeu o mundo dos games.",
       "categoria": "Jogo",
-      "data": "1993-12-10",
-      "imagem": "assets/img/doom/doom.jpeg",
-      "destaque": true
+      "data": "1980-05-22",
+      "imagem": "assets/img/pacman/pac-man.jpg",
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Versão portatil Pac-Man",
+          "imagem": "assets/img/pacman/pacmanportatil.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": "Criador Pac-Man",
+          "imagem": "assets/img/pacman/criadorpacman.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Poster Primeiro arcade Pac-Man",
+          "imagem": "assets/img/pacman/panfletopacman.png"
+        }
+      ]
     },
     {
       "id": "204",
+      "titulo": "Tetris (1984)",
+      "descricao": "Quebra-cabeça viciante criado na União Soviética.",
+      "conteudo": "Tetris** é notável por ter sido criado por um engenheiro de software russo e por ser um dos jogos mais portados de todos os tempos. Sua popularidade explodiu globalmente com o lançamento do Nintendo Game Boy, provando que jogos simples e viciantes podem ser eternos. É um mestre em design de jogos pela sua simplicidade e profundidade.",
+      "categoria": "Jogo",
+      "data": "1984-06-06",
+      "imagem": "assets/img/tetris/tetris.jpg",
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Criador Tetris",
+          "imagem": "assets/img/tetris/criadortetris.jpg"
+        },
+        {
+          "id": 2,
+          "titulo": "Game Boy Tetris",
+          "imagem": "assets/img/tetris/tetrisgb.jpg"
+        },
+        {
+          "id": 3,
+          "titulo": "Imagem do jogo Tetris",
+          "imagem": "assets/img/tetris/primeirotetris.png"
+        }
+      ]
+    },
+    {
+      "id": "205",
+      "titulo": "Super Mario Bros (1985)",
+      "descricao": "Lançado em 1985, Super Mario Bros é um jogo de plataforma onde o jogador controla Mario em sua missão para resgatar a Princesa Peach do vilão Bowser.",
+      "conteudo": "Super Mario Bros.** é o jogo de plataforma definitivo. Ele definiu o gênero, introduzindo conceitos como rolagem lateral suave, power-ups, e design de fases que ensina o jogador através da experiência. Seu sucesso no NES o tornou um divisor de águas e o jogo mais influente de todos os tempos.",
+      "categoria": "Jogo",
+      "data": "1985-09-13",
+      "imagem": "assets/img/smariobros/super-mario-bross.jpg",
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Capa Super Mario Bros",
+          "imagem": "assets/img/smariobros/capamario.png"
+        },
+        {
+          "id": 2,
+          "titulo": "Screenshot do jogo",
+          "imagem": "assets/img/smariobros/mariotela.png"
+        },
+        {
+          "id": 3,
+          "titulo": "criador do Super Mario bros",
+          "imagem": "assets/img/smariobros/criadormario.jpg"
+        }
+      ]
+    },
+    {
+      "id": "206",
       "titulo": "Street Fighter II (1991)",
       "descricao": "O jogo de luta que estabeleceu as regras do gênero competitivo.",
       "conteudo": "Street Fighter II transformou os jogos de luta com seu sistema de combos, elenco diversificado de personagens (cada um com movimentos especiais únicos) e foco na competição. Foi um sucesso estrondoso nos arcades e depois nos consoles, inspirando inúmeros imitadores e criando a base para os e-sports modernos.",
       "categoria": "Jogo",
       "data": "1991-03-01",
       "imagem": "assets/img/sfiihd/street-fighter-ii.jpeg",
-      "destaque": true
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Imagem da capa do cartucho do Super Nintendo",
+          "imagem": "assets/img/sfiihd/cartuchoSTFGII.jpeg"
+        },
+        {
+          "id": 2,
+          "titulo": "Screenshot da famosa fase de bônus",
+          "imagem": "assets/img/sfiihd/STFGHT-fase-bonus.jpeg"
+        },
+        {
+          "id": 3,
+          "titulo": "Screenshot da tela de seleção de personagens",
+          "imagem": "assets/img/sfiihd/street-fighter-tela-seleção.jpeg"
+        }
+      ]
     },
     {
-      "id": "205",
-      "titulo": "Super Mario Bros (1985)",
-      "descricao": "Lançado em 1985, Super Mario Bros é um jogo de plataforma onde o jogador controla Mario em sua missão para resgatar a Princesa Peach do vilão Bowser.",
-      "conteudo": "Super Mario Bros. é o jogo de plataforma definitivo. Ele definiu o gênero, introduzindo conceitos como rolagem lateral suave, power-ups, e design de fases que ensina o jogador através da experiência. Seu sucesso no NES o tornou um divisor de águas e o jogo mais influente de todos os tempos.",
+      "id": "207",
+      "titulo": "Doom (1993)",
+      "descricao": "O FPS que definiu o gênero e popularizou o multiplayer em rede local.",
+      "conteudo": "Lançado pela id Software em 1993, Doom foi um marco técnico e cultural. Seu uso de gráficos 3D (para a época) e a jogabilidade frenética com elementos de terror e ficção científica revolucionaram os jogos de tiro em primeira pessoa. O modo 'deathmatch' em rede local estabeleceu o multiplayer como conhecemos hoje. Sua influência é vista em quase todo FPS moderno.",
       "categoria": "Jogo",
-      "data": "1985-09-13",
-      "imagem": "assets/img/smariobros/super-mario-bross.jpg",
-      "destaque": true
+      "data": "1993-12-10",
+      "imagem": "assets/img/doom/doom.jpeg",
+      "destaque": true,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Capa do jogo Doom",
+          "imagem": "assets/img/doom/capa-doom.jpeg"
+        },
+        {
+          "id": 2,
+          "titulo": "Screenshot do jogo Doom",
+          "imagem": "assets/img/doom/doom-tela-primeira-pessoa.jpeg"
+        },
+        {
+          "id": 3,
+          "titulo": "Demon Iônico (Cyberdemon)",
+          "imagem": "assets/img/doom/Cyberdemon.jpeg"
+        }
+      ]
     }
   ],
   "noticias": [
@@ -90,9 +334,26 @@
       "descricao": "Muitos jogos retro estão sendo remasterizados ou refeitos para plataformas modernas.",
       "conteudo": "Muitos jogos retro estão sendo remasterizados ou refeitos para plataformas modernas. Títulos como 'The Legend of Zelda: Link's Awakening' e 'Final Fantasy VII Remake' trazem gráficos atualizados e jogabilidade aprimorada, permitindo que novas gerações experimentem esses clássicos com uma roupagem nova e atraente, mantendo a essência original. A facilidade de acesso em consoles modernos é um grande atrativo para os fãs do retrô.",
       "categoria": "Notícia",
-      "data": "2024-12-15",
+      "data": "2025-03-28",
       "imagem": "assets/img/remakes/remake.jpeg",
-      "destaque": false
+      "destaque": false,
+      "fotos": [
+        {
+          "id": 1,
+          "titulo": "Remake Final Fantasy VII",
+          "imagem": "assets/img/remakes/remakeff.jpeg"
+        },
+        {
+          "id": 2,
+          "titulo": "Remake Resident Evil 4",
+          "imagem": "assets/img/remakes/remakere.jpeg"
+        },
+        {
+          "id": 3,
+          "titulo": "Remake Zelda: Link's Awakening",
+          "imagem": "assets/img/remakes/remakezld.jpeg"
+        }
+      ]
     }
   ],
   "usuarios": [
@@ -127,7 +388,8 @@
       "senha": "1602",
       "admin": true,
       "favoritos": [
-        "203"
+        "203",
+        "207"
       ]
     }
   ]
