@@ -7,7 +7,8 @@
       "conteudo": "O Atari 2600 revolucionou o mercado em 1977, popularizando o conceito de cartuchos intercambiáveis. Com gráficos simples, mas inovadores para a época, trouxe a experiência de arcade para a sala de estar. Jogos como Space Invaders e Pitfall! se tornaram clássicos instantâneos. Sua influência é inegável, estabelecendo as bases para toda a indústria moderna de videogames.",
       "categoria": "Console",
       "data": "1977-09-11",
-      "imagem": "assets/img/atari2600/atari2600.jpg"
+      "imagem": "assets/img/atari2600/atari2600.jpg",
+      "destaque": false
     },
     {
       "id": "102",
@@ -16,76 +17,60 @@
       "conteudo": "O NES não apenas salvou a indústria após a crise de 1983, mas a redefiniu. Com um controle de qualidade rigoroso e títulos icônicos como Super Mario Bros. e The Legend of Zelda, ele introduziu a jogabilidade baseada em enredo e mecânicas mais complexas. Seu sucesso transformou a Nintendo em uma gigante global.",
       "categoria": "Console",
       "data": "1983-07-15",
-      "imagem": "assets/img/nes/nes.jpg"
+      "imagem": "assets/img/nes/nes.jpg",
+      "destaque": false
     },
     {
       "id": "103",
-      "titulo": "Sega Master System (1985)",
-      "descricao": "Lançado em 1985, o Sega Master System foi o principal concorrente do NES na era dos 8 bits.",
-      "conteudo": "O Master System foi a primeira grande aposta da Sega no mercado de consoles. Embora tenha tido mais sucesso na Europa e no Brasil do que na América do Norte, ele possuía gráficos tecnicamente superiores ao NES e introduziu personagens como Alex Kidd. Foi fundamental para iniciar a 'Guerra dos Consoles' com a Nintendo.",
-      "categoria": "Console",
-      "data": "1985-10-20",
-      "imagem": "assets/img/segams/Master-System.jpg"
-    },
-    {
-      "id": "104",
-      "titulo": "Sega Genesis (Mega Drive) (1988)",
-      "descricao": "Lançado em 1988, o Sega Genesis, conhecido como Mega Drive fora da América do Norte, foi um console de 16 bits que marcou a transição para gráficos mais avançados e jogabilidade mais complexa.",
-      "conteudo": "O Mega Drive marcou a transição para a era dos 16 bits. Sua campanha de marketing agressiva, focada na velocidade e no público adolescente, e a introdução de Sonic the Hedgehog, permitiram à Sega competir de igual para igual com o SNES. É lembrado por sua vasta biblioteca de jogos de arcade e RPGs.",
+      "titulo": "Sega Mega Drive / Genesis (1988)",
+      "descricao": "O console que trouxe a guerra dos 16 bits com Sonic the Hedgehog.",
+      "conteudo": "O Mega Drive (Genesis na América do Norte) foi o competidor direto do Super Nintendo. Conhecido por seu processador rápido, jogos de arcade mais fiéis e títulos como Sonic, Streets of Rage e Altered Beast. Sua campanha de marketing agressiva e foco em jogos para um público mais maduro definiram a era de 16 bits.",
       "categoria": "Console",
       "data": "1988-10-29",
-      "imagem": "assets/img/segamd/Mega-Drive.jpg"
-    },
-    {
-      "id": "105",
-      "titulo": "Super Nintendo (SNES) (1990)",
-      "descricao": "Console 16-bit conhecido por RPGs e plataformas inesquecíveis.",
-      "conteudo": "O Mega Drive marcou a transição para a era dos 16 bits. Sua campanha de marketing agressiva, focada na velocidade e no público adolescente, e a introdução de Sonic the Hedgehog, permitiram à Sega competir de igual para igual com o SNES. É lembrado por sua vasta biblioteca de jogos de arcade e RPGs.",
-      "categoria": "Console",
-      "data": "1990-11-21",
-      "imagem": "assets/img/snes/snes.jpg"
+      "imagem": "assets/img/segamd/Mega-Drive.jpg",
+      "destaque": false
     }
   ],
   "jogos": [
     {
       "id": "201",
-      "titulo": "Pong (1972)",
-      "descricao": "Um dos primeiros e mais simples jogos eletrônicos.",
-      "conteudo": "Pong é creditado como um dos primeiros jogos de arcade de sucesso comercial. Seu design extremamente simples (duas barras e uma bola) provou que o mercado de jogos eletrônicos era viável. Ele desencadeou a indústria de videogames e inspirou inúmeros jogos de esporte.",
+      "titulo": "Pac-Man (1980)",
+      "descricao": "O clássico jogo de arcade de labirinto, onde você come pastilhas e foge dos fantasmas.",
+      "conteudo": "Pac-Man é um dos jogos de arcade mais famosos e influentes. Lançado em 1980, sua mecânica simples de comer todos os pontos no labirinto enquanto evita os quatro fantasmas (Blinky, Pinky, Inky e Clyde) é atemporal. É um ícone da cultura pop e um pilar do design de jogos.",
       "categoria": "Jogo",
-      "data": "1972-11-29",
-      "imagem": "assets/img/pong/pong.png",
-      "destaque": true
-    },
-    {
-      "id": "202",
-      "titulo": "Space Invaders (1978)",
-      "descricao": "Um clássico de 1978, Space Invaders coloca o jogador no comando de uma nave que deve atirar e destruir hordas de alienígenas.",
-      "conteudo": "Space Invaders foi um fenômeno cultural global. É um dos primeiros jogos de tiro (shmup) e popularizou o conceito de pontuação alta. Sua demanda por moedas era tão alta que se diz ter causado uma escassez temporária de moedas de 100 ienes no Japão!",
-      "categoria": "Jogo",
-      "data": "1978-06-16",
-      "imagem": "assets/img/spinvaders/space-invaders.jpg",
+      "data": "1980-05-22",
+      "imagem": "assets/img/pacman/pac-man.jpg",
       "destaque": false
     },
     {
+      "id": "202",
+      "titulo": "Tetris (1984)",
+      "descricao": "Um jogo de puzzle viciante sobre encaixar peças que caem.",
+      "conteudo": "Criado na União Soviética, Tetris se tornou um fenômeno global, especialmente após ser empacotado com o Game Boy da Nintendo. Seu design de 'simples de aprender, difícil de dominar' e a natureza viciante de encaixar as formas (tetrominós) o tornam um dos jogos mais vendidos de todos os tempos. Sua simplicidade e genialidade atravessaram gerações.",
+      "categoria": "Jogo",
+      "data": "1984-06-06",
+      "imagem": "assets/img/tetris/tetris.jpg",
+      "destaque": true
+    },
+    {
       "id": "203",
-      "titulo": "Pac-Man (1980)",
-      "descricao": "Jogo de labirinto que virou ícone da cultura pop.",
-      "conteudo": "Pac-Man (originalmente Puck Man) é um dos jogos de arcade mais vendidos e reconhecidos de todos os tempos. Sua jogabilidade de labirinto, focada em estratégia e evasão, e o apelo do personagem, o transformaram em um ícone pop que transcendeu o mundo dos games.",
-      "categoria": "jogo",
-      "data": "1980-05-22",
-      "imagem": "assets/img/pacman/pac-man.jpg",
+      "titulo": "Doom (1993)",
+      "descricao": "O FPS que definiu o gênero e popularizou o multiplayer em rede local.",
+      "conteudo": "Lançado pela id Software em 1993, Doom foi um marco técnico e cultural. Seu uso de gráficos 3D (para a época) e a jogabilidade frenética com elementos de terror e ficção científica revolucionaram os jogos de tiro em primeira pessoa. O modo 'deathmatch' em rede local estabeleceu o multiplayer como conhecemos hoje. Sua influência é vista em quase todo FPS moderno.",
+      "categoria": "Jogo",
+      "data": "1993-12-10",
+      "imagem": "assets/img/doom/doom.jpeg",
       "destaque": true
     },
     {
       "id": "204",
-      "titulo": "Tetris (1984)",
-      "descricao": "Quebra-cabeça viciante criado na União Soviética.",
-      "conteudo": "Tetris é notável por ter sido criado por um engenheiro de software russo e por ser um dos jogos mais portados de todos os tempos. Sua popularidade explodiu globalmente com o lançamento do Nintendo Game Boy, provando que jogos simples e viciantes podem ser eternos.",
+      "titulo": "Street Fighter II (1991)",
+      "descricao": "O jogo de luta que estabeleceu as regras do gênero competitivo.",
+      "conteudo": "Street Fighter II transformou os jogos de luta com seu sistema de combos, elenco diversificado de personagens (cada um com movimentos especiais únicos) e foco na competição. Foi um sucesso estrondoso nos arcades e depois nos consoles, inspirando inúmeros imitadores e criando a base para os e-sports modernos.",
       "categoria": "Jogo",
-      "data": "1984-06-06",
-      "imagem": "assets/img/tetris/tetris.jpg",
-      "destaque": false
+      "data": "1991-03-01",
+      "imagem": "assets/img/sfiihd/street-fighter-ii.jpeg",
+      "destaque": true
     },
     {
       "id": "205",
@@ -105,8 +90,45 @@
       "descricao": "Muitos jogos retro estão sendo remasterizados ou refeitos para plataformas modernas.",
       "conteudo": "Muitos jogos retro estão sendo remasterizados ou refeitos para plataformas modernas. Títulos como 'The Legend of Zelda: Link's Awakening' e 'Final Fantasy VII Remake' trazem gráficos atualizados e jogabilidade aprimorada, permitindo que novas gerações experimentem esses clássicos com uma roupagem nova e atraente, mantendo a essência original. A facilidade de acesso em consoles modernos é um grande atrativo para os fãs do retrô.",
       "categoria": "Notícia",
-      "data": "2025-03-28",
-      "imagem": "assets/img/remakes/remake.jpeg"
+      "data": "2024-12-15",
+      "imagem": "assets/img/remakes/remake.jpeg",
+      "destaque": false
+    }
+  ],
+  "usuarios": [
+    {
+      "id": "187cb7e5-e097-4224-8bc7-b610c855e2b1",
+      "login": "admin",
+      "senha": "123",
+      "nome": "Administrador do Sistema",
+      "email": "admin@abc.com",
+      "admin": true,
+      "favoritos": [
+        "101",
+        "203"
+      ]
+    },
+    {
+      "id": "ec37c83d-4b7f-458d-9e10-3fda7d37cd3e",
+      "login": "user",
+      "senha": "123",
+      "nome": "Usuario Comum",
+      "email": "user@abc.com",
+      "admin": false,
+      "favoritos": [
+        "201"
+      ]
+    },
+    {
+      "id": "97d4f1b7-0bdd-43c6-b2dc-074fd6a4f332",
+      "nome": "gustavo",
+      "email": "g@gmail.com",
+      "login": "gusta",
+      "senha": "1602",
+      "admin": true,
+      "favoritos": [
+        "203"
+      ]
     }
   ]
 }

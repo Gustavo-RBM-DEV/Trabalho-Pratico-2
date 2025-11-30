@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin - Gerenciar Conteúdos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body id="admin-page">
@@ -19,87 +19,152 @@
   </header>
 
   <main class="container my-4">
-    <section class="mb-4">
-      <h2 class="section-title">Criar / Editar Item</h2>
-      <form id="admin-form" class="mb-3">
-        <div class="row g-2">
-          <div class="col-md-3">
-            <label class="form-label small text-muted">Entidade</label>
-            <select id="admin-entity" class="form-select">
-              <option value="consoles">Consoles</option>
-              <option value="jogos">Jogos</option>
-              <option value="noticias">Notícias</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Título</label>
-            <input type="text" id="admin-titulo" class="form-control" required>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label small text-muted">Categoria</label>
-            <select id="admin-categoria" class="form-select">
-              <option value="Console">Console</option>
-              <option value="Jogo">Jogo</option>
-              <option value="Notícia">Notícia</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label small text-muted">Data / Ano</label>
-            <input type="text" id="admin-data" class="form-control">
-          </div>
-          <div class="col-md-4 mt-2">
-            <label class="form-label small text-muted">URL da Imagem</label>
-            <input type="text" id="admin-imagem" class="form-control">
-          </div>
-          <div class="col-12 mt-2">
-            <label class="form-label small text-muted">Descrição / Conteúdo</label>
-            <textarea id="admin-descricao" class="form-control" rows="3" required></textarea>
-          </div>
-          <div class="col-md-2 mt-2 d-flex align-items-center ">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="admin-destaque">
-              <label class="form-check-label small text-muted" for="admin-destaque">Destaque</label>
-            </div>
-          </div>
-          <div class="col-12 mt-3 text-end">
-            <button id="admin-submit" type="submit" class="btn btn-outline-warning">Salvar</button>
-            <button id="admin-cancel" type="button" class="btn btn-secondary d-none">Cancelar</button>
-          </div>
-        </div>
-      </form>
-    </section>
+    <div id="access-denied" class="alert alert-danger text-center d-none" role="alert">
+        Acesso Negado! Apenas administradores podem acessar esta página. Faça login com uma conta admin.
+        <br><a href="login.html" class="alert-link">Ir para a página de Login</a>
+    </div>
 
-    <section>
-      <h2 class="section-title">Registros</h2>
-      <div class="mb-4">
-        <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+    <div id="admin-content" class="d-none">
+      <section class="mb-4">
+        <h2 class="section-title">Criar / Editar Item</h2>
+        <form id="admin-form" class="mb-3">
+          <div class="row g-2">
+            <div class="col-md-4">
+                <label for="item-tipo" class="form-label">Tipo de Item (Coleção)</label>
+                <select class="form-select bg-dark text-white border-warning" id="item-tipo" required>
+                    <option value="" disabled selected>Selecione a Categoria</option>
+                    <option value="consoles">Console</option>
+                    <option value="jogos">Jogo</option>
+                    <option value="noticias">Notícia</option>
+                </select>
+            </div>
+            <input type="hidden" id="item-id">
+            
+            <div class="col-md-8">
+              <label for="item-titulo" class="form-label">Título</label>
+              <input type="text" class="form-control bg-dark text-white border-warning" id="item-titulo" required>
+            </div>
+
+            <div class="col-md-12">
+              <label for="item-descricao" class="form-label">Descrição (Curta)</label>
+              <input type="text" class="form-control bg-dark text-white border-warning" id="item-descricao" required>
+            </div>
+
+            <div class="col-md-8">
+              <label for="item-imagem" class="form-label">URL da Imagem</label>
+              <input type="url" class="form-control bg-dark text-white border-warning" id="item-imagem" required>
+            </div>
+
+             <div class="col-md-4">
+                <label for="item-data" class="form-label">Data (Lançamento/Publicação)</label>
+                <input type="date" class="form-control bg-dark text-white border-warning" id="item-data" required>
+            </div>
+
+            <div class="col-md-12">
+              <label for="item-conteudo" class="form-label">Conteúdo Completo</label>
+              <textarea class="form-control bg-dark text-white border-warning" id="item-conteudo" rows="4" required></textarea>
+            </div>
+
+            <div class="col-md-12 mt-3">
+              <div class="form-check">
+                <input class="form-check-input border-warning bg-dark" type="checkbox" value="" id="item-destaque">
+                <label class="form-check-label text-white" for="item-destaque">
+                  Marcar como Destaque no Carrossel da Home
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-md-12 mt-4 text-center">
+              <button type="submit" class="btn btn-warning btn-lg me-3" id="save-button">
+                <i class="bi bi-save"></i> Salvar Item
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg" id="clear-form-button">
+                <i class="bi bi-x-circle"></i> Limpar Formulário
+              </button>
+            </div>
+            <div class="col-md-12 mt-3">
+              <div id="form-feedback" class="alert d-none" role="alert"></div>
+            </div>
+
+          </div>
+        </form>
+      </section>
+
+      <hr class="border-warning my-5">
+
+      <section>
+        <h2 class="section-title">Itens Existentes (CRUD)</h2>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="tab-consoles" data-bs-toggle="tab" data-bs-target="#pane-consoles"
-              type="button" role="tab">Consoles</button>
+            <button class="nav-link active" id="tab-consoles" data-bs-toggle="tab" data-bs-target="#pane-consoles" type="button" role="tab" aria-controls="pane-consoles" aria-selected="true">Consoles</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-jogos" data-bs-toggle="tab" data-bs-target="#pane-jogos" type="button"
-              role="tab">Jogos</button>
+            <button class="nav-link" id="tab-jogos" data-bs-toggle="tab" data-bs-target="#pane-jogos" type="button" role="tab" aria-controls="pane-jogos" aria-selected="false">Jogos</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-noticias" data-bs-toggle="tab" data-bs-target="#pane-noticias"
-              type="button" role="tab">Notícias</button>
+            <button class="nav-link" id="tab-noticias" data-bs-toggle="tab" data-bs-target="#pane-noticias" type="button" role="tab" aria-controls="pane-noticias" aria-selected="false">Notícias</button>
           </li>
         </ul>
         <div class="tab-content bg-black p-3 border border-warning rounded">
-          <div class="tab-pane fade show active" id="pane-consoles" role="tabpanel">
-            <div id="table-consoles" class="table-responsive"></div>
+          
+          <div class="tab-pane fade show active" id="pane-consoles" role="tabpanel" aria-labelledby="tab-consoles" tabindex="0">
+            <div class="table-responsive">
+              <table class="table table-dark table-striped table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Descrição</th>
+                    <th>Destaque</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body-consoles">
+                  </tbody>
+              </table>
+            </div>
           </div>
-          <div class="tab-pane fade" id="pane-jogos" role="tabpanel">
-            <div id="table-jogos" class="table-responsive"></div>
-          </div>
-          <div class="tab-pane fade" id="pane-noticias" role="tabpanel">
-            <div id="table-noticias" class="table-responsive"></div>
-          </div>
-        </div>
-      </div>
-    </section>
 
+          <div class="tab-pane fade" id="pane-jogos" role="tabpanel" aria-labelledby="tab-jogos" tabindex="0">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descrição</th>
+                            <th>Destaque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-jogos">
+                      </tbody>
+                </table>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="pane-noticias" role="tabpanel" aria-labelledby="tab-noticias" tabindex="0">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descrição</th>
+                            <th>Destaque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-noticias">
+                      </tbody>
+                </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
   </main>
 
   <footer class="bg-black py-3 text-center border-top border-warning">
@@ -107,7 +172,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/scripts/app.js"></script>
+  <script src="assets/scripts/app.js"></script> 
 </body>
-
 </html>

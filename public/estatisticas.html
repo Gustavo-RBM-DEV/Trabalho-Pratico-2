@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Estatísticas - Games Retrô</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="assets/css/styles.css"> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body id="estatisticas-page">
   <header class="site-header py-4 d-flex align-items-center position-relative">
@@ -14,22 +13,35 @@
       <img src="assets/img/logo.png" alt="Logo Games Retrô" style="height: 80px; width: auto;">
     </a>
     <h1 class="display-6 text-glow flex-grow-1 text-center m-0">Estatísticas dos Games Retrô</h1>
-    <a href="admin.html" class="btn btn-outline-warning">Gerenciar Conteúdos</a>
-     <a href="index.html" class="btn btn-outline-warning">← Voltar à Home</a>
+    <nav class="d-flex align-items-center" id="main-nav-actions">
+        </nav>
   </header>
 
   <main class="container my-5">
-    <section>
-      <h2 class="section-title mb-4">Distribuição de Itens por Categoria</h2>
-      <canvas id="graficoCategorias" width="400" height="200"></canvas>
-    </section>
+    <div class="row">
+        <div class="col-md-6 mb-5"> 
+            <section>
+                <h2 class="section-title mb-4">Distribuição de Itens por Categoria</h2>
+                <div class="card bg-dark border-warning p-3">
+                    <canvas id="graficoCategorias"></canvas> 
+                </div>
+            </section>
+        </div>
 
-    <hr class="border-warning my-5">
+        <div class="col-md-6 mb-5">
+            <section>
+                <h2 class="section-title mb-4">Quantidade de Jogos por Ano</h2>
+                <div class="card bg-dark border-warning p-3">
+                    <canvas id="graficoJogosPorAno"></canvas> 
+                </div>
+            </section>
+        </div>
+    </div>
 
-    <section>
-      <h2 class="section-title mb-4">Quantidade de Jogos por Ano</h2>
-      <canvas id="graficoJogosPorAno" width="400" height="200"></canvas>
-    </section>
+    <div class="mt-5 text-center">
+        <a href="index.html" class="btn btn-outline-warning">← Voltar à Home</a>
+    </div>
+
   </main>
 
   <footer class="bg-black py-3 text-center border-top border-warning">

@@ -1,478 +1,838 @@
 
-const BASE = "http://localhost:3000";
-const ENDPOINTS = {
-    consoles: `${BASE}/consoles`,
-    jogos: `${BASE}/jogos`,
-    noticias: `${BASE}/noticias`
-};
-
-let formMode = 'create'; 
-let editEntity = null;
-let editId = null;
-
-function escapeHtml(str) {
-    if (!str && str !== 0) return '';
-    return String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", "&#039;");
-}
-function formatContent(text) {
-    if (!text) return '';
-    return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-}
+const API_URL = 'http://localhost:3000';
 
 
-async function safeFetchJson(url, opts) {
-    const res = await fetch(url, opts);
-    if (!res.ok) {
-        throw new Error(`Erro na requisição para ${url}: ${res.status} ${res.statusText}`);
-    }
-    const text = await res.text();
-    return text ? JSON.parse(text) : {};
-}
+let allItems = [];
+let usuarioLogado = null;
+let favoritosUsuario = [];
 
-async function fetchAllEntities() {
-    const [c, j, n] = await Promise.all([
-        fetch(ENDPOINTS.consoles).then(r => r.ok ? r.json() : []),
-        fetch(ENDPOINTS.jogos).then(r => r.ok ? r.json() : []),
-        fetch(ENDPOINTS.noticias).then(r => r.ok ? r.json() : [])
-    ]);
-    return { consoles: c, jogos: j, noticias: n };
-}
-
-
-
-function createCarouselItemHtml(item, index) { 
-    const urlEntity = 'jogos'; 
-    return `
-    <div class="carousel-item ${index === 0 ? 'active' : ''}">
-        <img src="${item.imagem}" class="d-block w-100 carousel-img" alt="${escapeHtml(item.titulo)}" onerror="this.src='assets/img/placeholder.png'">
-        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-2">
-            <h5>${escapeHtml(item.titulo)}</h5>
-            <p>${escapeHtml(item.descricao)}</p>
-            <a href="detalhes.html?entity=${urlEntity}&id=${item.id}" class="btn btn-sm btn-warning">Ver Detalhes</a>
-        </div>
-    </div>
-    `;
-}
-
-async function montarCarouselJogosDestaque() { 
-    try {
-        const url = `${ENDPOINTS.jogos}?destaque=true`;
-        const jogosDestaque = await safeFetchJson(url);
-        
-        const container = document.getElementById('carousel-container');
-        if (!container) return;
-
-        if (jogosDestaque.length === 0) {
-            container.innerHTML = '<p class="text-warning">Nenhum jogo em destaque encontrado.</p>';
-            return;
+function carregarUsuario() {
+    const usuarioStr = sessionStorage.getItem('usuarioLogado');
+    if (usuarioStr) {
+        try {
+            usuarioLogado = JSON.parse(usuarioStr);
+            favoritosUsuario = Array.isArray(usuarioLogado.favoritos) ? usuarioLogado.favoritos : [];
+        } catch (e) {
+            console.error('Erro ao fazer parse do usuário logado:', e);
+            sessionStorage.removeItem('usuarioLogado');
         }
-
-        const indicators = jogosDestaque.map((_, index) => `<button type="button" data-bs-target="#carouselDestaques" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>`).join('');
-        const items = jogosDestaque.map(createCarouselItemHtml).join('');
-
-        container.innerHTML = `
-        <div id="carouselDestaques" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">${indicators}</div>
-            <div class="carousel-inner">${items}</div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselDestaques" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselDestaques" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span>
-            </button>
-        </div>
-        `;
-    } catch (error) {
-        console.error("Erro ao montar o carrossel:", error);
-        const container = document.getElementById('carousel-container');
-        if (container) container.innerHTML = `<p class="alert alert-danger">Erro ao carregar destaques: ${error.message}. Verifique o JSONServer.</p>`;
+    } else {
+        usuarioLogado = null;
+        favoritosUsuario = [];
     }
 }
 
-function createCardHtml(item, entityName) { 
-    const entitySingular = item.categoria; 
-    const dateOrYear = item.data ? (item.data.length > 4 ? item.data.substring(0, 4) : item.data) : 'N/A';
-    const urlEntity = entityName; 
 
-    return `
-    <div class="col">
-        <div class="card bg-black border-warning h-100">
-            <img src="${item.imagem}" class="card-img-top card-img-custom" alt="${escapeHtml(item.titulo || item.nome)}" onerror="this.src='assets/img/placeholder.png'">
-            <div class="card-body">
-                <span class="badge bg-warning text-dark mb-2">${escapeHtml(entitySingular)}</span>
-                <h5 class="card-title text-warning">${escapeHtml(item.titulo || item.nome)}</h5>
-                <p class="card-text">${escapeHtml(item.descricao)}</p>
-            </div>
-            <div class="card-footer bg-warning border-warning d-flex justify-content-between align-items-center">
-                <small class="text-dark">Ano: ${dateOrYear}</small>
-                <a href="detalhes.html?entity=${urlEntity}&id=${item.id}" class="btn btn-sm btn-dark">Detalhes</a>
-            </div>
-        </div>
-    </div>
-    `;
+function isFavorito(itemId) {
+    if (!usuarioLogado) return false;
+    return favoritosUsuario.includes(itemId);
 }
 
-async function montarSecaoCardsUnificados() { 
-    try {
-        const { consoles, jogos, noticias } = await fetchAllEntities();
-        
-        const allItems = [
-            ...consoles.map(item => ({...item, entityName: 'consoles', categoria: item.categoria || 'Console'})),
-            ...jogos.map(item => ({...item, entityName: 'jogos', categoria: item.categoria || 'Jogo'})),
-            ...noticias.map(item => ({...item, entityName: 'noticias', categoria: item.categoria || 'Notícia'}))
-        ];
 
-        allItems.sort((a, b) => {
-            const dateA = a.data ? new Date(a.data) : new Date(0);
-            const dateB = b.data ? new Date(b.data) : new Date(0);
-            return dateB - dateA;
-        });
-
-        const cardsContainer = document.getElementById('cards-unificados');
-        if (!cardsContainer) return;
-
-        if (allItems.length === 0) {
-            cardsContainer.innerHTML = '<p class="text-warning">Nenhum conteúdo retro encontrado.</p>';
-            return;
-        }
-
-        const cardsHtml = allItems.map(item => createCardHtml(item, item.entityName)).join('');
-        cardsContainer.innerHTML = cardsHtml;
-    } catch (error) {
-        console.error("Erro ao montar seção de cards:", error);
-        const container = document.getElementById('cards-unificados');
-        if (container) container.innerHTML = `<p class="alert alert-danger">Erro ao carregar conteúdo: ${error.message}. Verifique o JSONServer.</p>`;
-    }
-}
-
-async function montarDetalhesItem() { 
-    const params = new URLSearchParams(window.location.search);
-    const entity = params.get('entity');
-    const id = params.get('id');
-
-    const detalhesItemContainer = document.getElementById('detalhes-item');
-
-    if (!entity || !id || !ENDPOINTS[entity]) {
-        detalhesItemContainer.innerHTML = '<p class="alert alert-danger">Detalhes não encontrados. Item ou ID inválido na URL.</p>';
+async function toggleFavorito(itemId, iconElement) {
+    if (!usuarioLogado) {
+        alert('Você precisa estar logado para marcar favoritos.');
+        window.location.href = 'login.html';
         return;
     }
 
+    const isCurrentlyFavorite = isFavorito(itemId);
+    let newFavoritos;
+
+    if (isCurrentlyFavorite) {
+        newFavoritos = favoritosUsuario.filter(id => id !== itemId);
+    } else {
+        newFavoritos = [...favoritosUsuario, itemId];
+    }
+
     try {
-        const url = `${ENDPOINTS[entity]}/${id}`;
-        const item = await safeFetchJson(url);
-        
-        if (!item || item.id === undefined) {
-             detalhesItemContainer.innerHTML = '<p class="alert alert-warning">Item não encontrado na base de dados.</p>';
-             return;
+        const response = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ favoritos: newFavoritos })
+        });
+
+        if (response.ok) {
+            usuarioLogado.favoritos = newFavoritos;
+            favoritosUsuario = newFavoritos;
+            sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+            
+            if (newFavoritos.includes(itemId)) {
+                iconElement.classList.remove('bi-heart');
+                iconElement.classList.add('bi-heart-fill');
+            } else {
+                iconElement.classList.remove('bi-heart-fill');
+                iconElement.classList.add('bi-heart');
+            }
+
+            if (document.body.id === 'favoritos-page') {
+                loadAndDisplayFavorites();
+            }
+
+        } else {
+            throw new Error('Falha ao salvar favoritos no servidor.');
         }
 
-        document.title = `${item.titulo || item.nome} - Games Retrô`;
+    } catch (error) {
+        console.error('Erro ao atualizar favoritos:', error);
+        alert('Erro ao salvar sua preferência de favorito. Tente novamente.');
+    }
+}
 
-        const detalhesHtml = `
-            <div class="row">
-                <div class="col-md-5 mb-3">
-                    <img src="${item.imagem}" class="img-fluid rounded border border-warning" alt="${escapeHtml(item.titulo || item.nome)}" onerror="this.src='assets/img/placeholder.png'">
-                </div>
-                <div class="col-md-7">
-                    <span class="badge bg-warning text-dark mb-2">${escapeHtml(item.categoria || 'Item')}</span>
-                    <h2 class="display-4 text-glow mb-3">${escapeHtml(item.titulo || item.nome)}</h2>
-                    <p class="lead">${escapeHtml(item.descricao)}</p>
-                    <hr class="border-warning">
-                    <p><strong>Ano/Data:</strong> ${escapeHtml(item.data || 'N/A')}</p>
-                    <div class="text-light">
-                        <p><strong>Conteúdo:</strong></p>
-                        <p>${formatContent(item.conteudo || item.descricao)}</p>
+
+function createFavoriteButton(item, isLarge = false) {
+    const isFav = isFavorito(item.id);
+    const iconClass = isFav ? 'bi-heart-fill' : 'bi-heart';
+    const textClass = isFav ? 'text-danger' : 'text-white-50';
+    const fsClass = isLarge ? 'fs-3' : 'fs-5';
+
+    if (!usuarioLogado) {
+        return `<i class="bi ${iconClass} ${textClass} ${fsClass}" title="Faça login para favoritar"></i>`;
+    }
+
+    return `<i class="bi ${iconClass} ${textClass} ${fsClass}" data-item-id="${item.id}" title="Marcar como Favorito"></i>`;
+}
+
+
+function renderizarCabecalho() {
+    const navActions = document.getElementById('main-nav-actions');
+    if (!navActions) return; 
+
+    navActions.innerHTML = '';
+
+    if (usuarioLogado && usuarioLogado.admin) {
+        navActions.innerHTML += `
+            <a href="admin.html" class="btn btn-outline-warning me-2">Gerenciar Conteúdos</a>
+        `;
+    }
+
+    if (usuarioLogado) {
+        navActions.innerHTML += `
+            <a href="favoritos.html" class="btn btn-outline-light me-2">Meus Favoritos</a>
+            <span class="text-warning me-2 d-none d-md-inline-block">Olá, ${usuarioLogado.login}!</span>
+            <button class="btn btn-warning" onclick="handleLogout()">Logout</button>
+        `;
+    } else {
+        navActions.innerHTML += `
+            <a href="login.html" class="btn btn-warning">Login / Cadastro</a>
+        `;
+    }
+    
+    navActions.innerHTML += `
+        <a href="estatisticas.html" class="btn btn-outline-info ms-2">Estatísticas</a>
+    `;
+}
+
+function handleLogout() {
+    sessionStorage.removeItem('usuarioLogado');
+    usuarioLogado = null;
+    favoritosUsuario = [];
+    window.location.reload(); 
+}
+
+function renderizarCarrossel(items) {
+    const carouselInner = document.getElementById('carousel-inner');
+    if (!carouselInner) return;
+
+    const destaqueItems = items.filter(item => item.destaque).slice(0, 3);
+    let html = '';
+
+    destaqueItems.forEach((item, index) => {
+        html += `
+            <div class="carousel-item ${index === 0 ? 'active' : ''}" data-bs-interval="5000">
+                <a href="detalhes.html?id=${item.id}&type=${item.categoria.toLowerCase()}">
+                    <img src="${item.imagem}" class="d-block w-100" alt="${item.titulo}">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>${item.titulo}</h5>
+                        <p>${item.descricao}</p>
+                    </div>
+                </a>
+            </div>
+        `;
+    });
+    carouselInner.innerHTML = html || '<p class="text-center text-warning">Nenhum item em destaque encontrado.</p>';
+}
+
+function renderizarCards(itemsToRender) {
+    const itemCardsContainer = document.getElementById('item-cards');
+    const noResultsMessage = document.getElementById('no-results-message') || document.getElementById('mensagem-vazio');
+
+    if (!itemCardsContainer || !noResultsMessage) return;
+
+    if (itemsToRender.length === 0) {
+        itemCardsContainer.innerHTML = '';
+        noResultsMessage.classList.remove('d-none');
+        return;
+    }
+
+    noResultsMessage.classList.add('d-none');
+    let cardsHTML = '';
+
+    itemsToRender.forEach(item => {
+        const favButtonHTML = createFavoriteButton(item);
+        const tipo = item.categoria.toLowerCase();
+        cardsHTML += `
+            <div class="col">
+                <div class="card bg-dark border-warning h-100 item-card">
+                    <img src="${item.imagem}" class="card-img-top" alt="${item.titulo}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title">${item.titulo}</h5>
+                            <button class="btn btn-link p-0 fav-button" data-item-id="${item.id}" onclick="toggleFavorito('${item.id}', this.querySelector('i'))" title="Favoritar">
+                                ${favButtonHTML}
+                            </button>
+                        </div>
+                        <p class="card-text">${item.descricao}</p>
+                        <a href="detalhes.html?id=${item.id}&type=${tipo}" class="btn btn-outline-warning mt-auto">Ver Detalhes</a>
                     </div>
                 </div>
             </div>
         `;
-        detalhesItemContainer.innerHTML = detalhesHtml;
-
-    } catch (error) {
-        console.error(`Erro ao buscar detalhes do item ${entity}/${id}:`, error);
-        detalhesItemContainer.innerHTML = `<p class="alert alert-danger">Erro ao carregar detalhes: ${error.message}. Verifique o JSONServer.</p>`;
-    }
-}
-
-
-
-function resetAdminForm() {
-    formMode = 'create';
-    editEntity = null;
-    editId = null;
-    document.getElementById('admin-form').reset();
-    document.getElementById('admin-submit').innerText = 'Salvar';
-    document.getElementById('admin-cancel').classList.add('d-none');
-    
-    const entitySelect = document.getElementById('admin-entity');
-    if (entitySelect) entitySelect.value = 'consoles';
-    const categoriaSelect = document.getElementById('admin-categoria');
-    if (categoriaSelect) categoriaSelect.value = 'Console';
-}
-
-async function salvarItem(event) {
- 
-    event.preventDefault(); 
-    
-    
-    console.log("Formulário submetido! O Fetch POST/PUT será executado agora.");
-
-    const entity = document.getElementById('admin-entity')?.value;
-    const titulo = document.getElementById('admin-titulo')?.value.trim();
-    const categoria = document.getElementById('admin-categoria')?.value.trim();
-    const data = document.getElementById('admin-data')?.value.trim();
-    const imagem = document.getElementById('admin-imagem')?.value.trim();
-    const descricao = document.getElementById('admin-descricao')?.value.trim();
-    const destaque = document.getElementById('admin-destaque')?.checked;
-    
-    if (!entity || !titulo || !descricao || !data || !imagem || !categoria) {
-        alert("Todos os campos obrigatórios (Entidade, Título, Descrição, Data, Imagem, Categoria) devem ser preenchidos.");
-        return;
-    }
-
-    const itemData = {
-        titulo,
-        descricao: descricao.split('\n')[0].trim(),
-        conteudo: descricao,
-        categoria,
-        data,
-        imagem,
-    };
-    
-    if (entity === 'jogos') {
-        itemData.destaque = destaque;
-    }
-
-    const url = formMode === 'create' ? ENDPOINTS[entity] : `${ENDPOINTS[editEntity]}/${editId}`;
-    const method = formMode === 'create' ? 'POST' : 'PUT';
-
-    try {
-        const response = await safeFetchJson(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(itemData)
-        });
-        
-        
-        console.log(`Resposta do Servidor:`, response);
-        
-        alert(`Item ${formMode === 'create' ? 'criado' : 'atualizado'} com sucesso!`);
-        resetAdminForm();
-        loadAdminTables();
-
-    } catch (error) {
-        console.error(`Erro ao ${formMode === 'create' ? 'criar' : 'atualizar'} item:`, error);
-        alert(`Erro ao ${formMode === 'create' ? 'criar' : 'atualizar'} item: ${error.message}.`);
-    }
-}
-
-async function startEdit(entity, id) { 
-    try {
-        const item = await safeFetchJson(`${ENDPOINTS[entity]}/${id}`);
-
-        formMode = 'edit';
-        editEntity = entity;
-        editId = id;
-
-        document.getElementById('admin-entity').value = entity;
-        document.getElementById('admin-titulo').value = item.titulo || item.nome || '';
-        document.getElementById('admin-categoria').value = item.categoria || '';
-        document.getElementById('admin-data').value = item.data || ''; 
-        document.getElementById('admin-imagem').value = item.imagem || '';
-        document.getElementById('admin-descricao').value = item.conteudo || item.descricao || '';
-        document.getElementById('admin-destaque').checked = !!item.destaque; 
-
-        document.getElementById('admin-submit').innerText = 'Salvar Edição';
-        document.getElementById('admin-cancel').classList.remove('d-none');
-        
-        document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
-
-    } catch (error) {
-        console.error(`Erro ao carregar item para edição ${entity}/${id}:`, error);
-        alert(`Erro ao carregar item para edição: ${error.message}.`);
-    }
-}
-
-async function excluirItem(entity, id) { 
-    if (!confirm(`Tem certeza que deseja excluir o item ID ${id} de ${entity}?`)) {
-        return;
-    }
-
-    try {
-        await safeFetchJson(`${ENDPOINTS[entity]}/${id}`, { method: 'DELETE' });
-
-        alert('Item excluído com sucesso!');
-        loadAdminTables();
-
-    } catch (error) {
-        console.error(`Erro ao excluir item ${entity}/${id}:`, error);
-        alert(`Erro ao excluir item: ${error.message}.`);
-    }
-}
-
-
-function createTableHtml(items, entity) { 
-    if (!items || items.length === 0) {
-        return '<p class="text-warning">Nenhum registro encontrado.</p>';
-    }
-
-    let html = `
-    <table class="table table-dark table-striped table-hover table-sm">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Título</th>
-                <th>Categoria</th>
-                <th>Ano/Data</th>
-                <th>Destaque</th>
-                <th class="text-end">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-    `;
-
-    items.forEach(it => {
-        html += `
-        <tr>
-            <td>${it.id}</td>
-            <td>${escapeHtml(it.titulo || it.nome || '')}</td>
-            <td>${escapeHtml(it.categoria || 'N/A')}</td>
-            <td>${escapeHtml(it.data || 'N/A')}</td>
-            <td>${it.destaque ? 'Sim' : '—'}</td>
-            <td class="text-end">
-                <button class="btn btn-sm btn-outline-warning me-2" onclick="startEdit('${entity}', '${it.id}')">Editar</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="excluirItem('${entity}', '${it.id}')">Excluir</button>
-            </td>
-        </tr>`;
     });
 
-    html += '</tbody></table>';
-    return html;
+    itemCardsContainer.innerHTML = cardsHTML;
 }
 
-async function loadAdminTables() { 
-    try {
-        const { consoles, jogos, noticias } = await fetchAllEntities();
-        document.getElementById('table-consoles').innerHTML = createTableHtml(consoles, 'consoles');
-        document.getElementById('table-jogos').innerHTML = createTableHtml(jogos, 'jogos');
-        document.getElementById('table-noticias').innerHTML = createTableHtml(noticias, 'noticias');
-    } catch (error) {
-        console.error("Erro ao carregar tabelas admin:", error);
-        const errorMessage = `<p class="alert alert-danger">Erro ao carregar dados do servidor: ${error.message}. Certifique-se de que o JSONServer está rodando em ${BASE}.</p>`;
-        document.getElementById('table-consoles').innerHTML = errorMessage;
-        document.getElementById('table-jogos').innerHTML = errorMessage;
-        document.getElementById('table-noticias').innerHTML = errorMessage;
+function handleSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : ''; 
+    
+    if (searchTerm === '') {
+        renderizarCards(allItems);
+        return;
+    }
+
+    const filteredItems = allItems.filter(item =>
+        item.titulo.toLowerCase().includes(searchTerm) ||
+        item.descricao.toLowerCase().includes(searchTerm) ||
+        item.categoria.toLowerCase().includes(searchTerm)
+    );
+    renderizarCards(filteredItems);
+}
+
+function handleClearSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    handleSearch(); 
+}
+
+function setupSearchListeners() {
+    const searchInput = document.getElementById('search-input');
+    const clearButton = document.getElementById('clear-search-button');
+    const searchButton = document.getElementById('search-button');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
+    if (searchButton) {
+        searchButton.addEventListener('click', (e) => e.preventDefault());
+    }
+    if (clearButton) {
+        clearButton.addEventListener('click', handleClearSearch);
     }
 }
 
+function renderizarDetalhes(item) {
+    const detalhesContainer = document.getElementById('detalhes-item');
+    if (!detalhesContainer || !item) {
+        detalhesContainer.innerHTML = `<div class="alert alert-danger text-center" role="alert">Item não encontrado ou URL inválida.</div>`;
+        return;
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Home page
-    if (document.body && document.body.id === 'home-page') {
-        montarCarouselJogosDestaque();
-        montarSecaoCardsUnificados();
+    const favButtonHTML = createFavoriteButton(item, true); 
+    const tipo = item.categoria.toLowerCase();
+
+    detalhesContainer.innerHTML = `
+        <div class="card bg-dark border-warning shadow-lg p-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <img src="${item.imagem}" class="img-fluid rounded border border-warning" alt="${item.titulo}">
+                    </div>
+                    <div class="col-md-8 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h2 class="display-5 text-glow">${item.titulo}</h2>
+                            <button id="fav-detail-button" class="btn btn-link p-0" data-item-id="${item.id}" onclick="toggleFavorito('${item.id}', this.querySelector('i'))" title="Favoritar">
+                                ${favButtonHTML}
+                            </button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-warning text-dark me-2">${item.categoria}</span>
+                            <span class="badge bg-secondary">${item.data ? new Date(item.data).toLocaleDateString('pt-BR') : 'Data Desconhecida'}</span>
+                        </div>
+
+                        <p class="lead text-white-50">${item.descricao}</p>
+
+                        <hr class="border-warning my-3">
+
+                        <div class="text-white-50 mb-2 flex-grow-1">
+                            <h4>Conteúdo Completo:</h4>
+                            <p>${item.conteudo}</p>
+                        </div>
+                        <a href="index.html" class="btn btn-outline-warning mt-auto w-100">← Voltar à Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function loadAndDisplayFavorites() {
+    const itemCardsContainer = document.getElementById('item-cards'); 
+    const mensagemVazio = document.getElementById('mensagem-vazio');
+    const titulo = document.querySelector('#lista-favoritos h2');
+
+    if (!itemCardsContainer || !mensagemVazio || !titulo) return;
+    
+    if (!usuarioLogado) {
+        titulo.textContent = 'Acesso Negado';
+        itemCardsContainer.innerHTML = '';
+        mensagemVazio.innerHTML = 'Você precisa estar logado para ver seus favoritos. <a href="login.html" class="text-warning">Clique aqui para fazer login.</a>';
+        mensagemVazio.classList.remove('d-none');
+        return;
     }
-    // Detalhes
-    if (document.body && document.body.id === 'detalhes-page') {
-        montarDetalhesItem();
+    
+    const favoriteItems = allItems.filter(item => favoritosUsuario.includes(item.id));
+
+    if (favoriteItems.length === 0) {
+        titulo.textContent = 'Itens Favoritados'; 
+        itemCardsContainer.innerHTML = '';
+        mensagemVazio.innerHTML = 'Você ainda não tem itens favoritos. Navegue e adicione alguns!';
+        mensagemVazio.classList.remove('d-none');
+        return;
     }
-    // Admin
-    if (document.body && document.body.id === 'admin-page') {
-        loadAdminTables();
-        
-      
-        const adminForm = document.getElementById('admin-form');
-        if (adminForm) {
-            console.log("Formulário admin-form encontrado. Anexando listener.");
-            adminForm.addEventListener('submit', salvarItem); 
-        } else {
-            console.error("ERRO CRÍTICO: Não foi possível encontrar o elemento com ID 'admin-form'. Verifique seu admin.html!");
+    
+    titulo.textContent = `Itens Favoritados (${favoriteItems.length})`; 
+    mensagemVazio.classList.add('d-none');
+    renderizarCards(favoriteItems); 
+}
+
+function renderizarResumoDados() {
+    const counts = allItems.reduce((acc, item) => {
+        const categoria = (item.categoria || '').toLowerCase(); 
+        if (categoria.includes('console')) acc.consoles++;
+        else if (categoria.includes('jogo')) acc.jogos++;
+        else if (categoria.includes('notíci') || categoria.includes('noticia')) acc.noticias++; 
+        return acc;
+    }, { consoles: 0, jogos: 0, noticias: 0 });
+
+    const totalConsolesEl = document.getElementById('total-consoles');
+    const totalJogosEl = document.getElementById('total-jogos');
+    const totalNoticiasEl = document.getElementById('total-noticias');
+
+    if (totalConsolesEl) totalConsolesEl.textContent = counts.consoles;
+    if (totalJogosEl) totalJogosEl.textContent = counts.jogos;
+    if (totalNoticiasEl) totalNoticiasEl.textContent = counts.noticias;
+}
+
+function renderizarGraficoCategoriasHome() {
+    const canvas = document.getElementById('graficoCategoriasHome');
+    // Verifica se a biblioteca Chart.js está carregada
+    if (!canvas || typeof Chart === 'undefined') return; 
+    
+    const ctx = canvas.getContext('2d');
+    
+    const categoriaCounts = allItems.reduce((acc, item) => {
+        const categoria = item.categoria || 'Outros';
+        acc[categoria] = (acc[categoria] || 0) + 1;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(categoriaCounts);
+    const data = Object.values(categoriaCounts);
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Itens por Categoria',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)', 
+                    'rgba(54, 162, 235, 0.7)', 
+                    'rgba(255, 206, 86, 0.7)', 
+                    'rgba(75, 192, 192, 0.7)'  
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#e0e0e0'
+                    }
+                }
+            }
         }
-        
-        const btnCancel = document.getElementById('admin-cancel');
-        if (btnCancel) {
-            btnCancel.addEventListener('click', resetAdminForm);
-        }
-        
-        resetAdminForm();
-    }
-});
+    });
+}
 
-async function montarGraficos() {
-  try {
-    const { consoles, jogos, noticias } = await fetchAllEntities();
+function renderizarGraficoCategorias() {
+    const ctx = document.getElementById('graficoCategorias')?.getContext('2d');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    const categoriaCounts = allItems.reduce((acc, item) => {
+        const categoria = item.categoria || 'Outros';
+        acc[categoria] = (acc[categoria] || 0) + 1;
+        return acc;
+    }, {});
 
-    // Gráfico 1: Itens por categoria
-    const ctx1 = document.getElementById('graficoCategorias');
-    if (ctx1) {
-      new Chart(ctx1, {
+    const labels = Object.keys(categoriaCounts);
+    const data = Object.values(categoriaCounts);
+    
+    new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: ['Consoles', 'Jogos', 'Notícias'],
-          datasets: [{
-            data: [consoles.length, jogos.length, noticias.length],
-            backgroundColor: ['#ffcc00', '#ff6600', '#ff3300'],
-            borderColor: '#111',
-            borderWidth: 2
-          }]
+            labels: labels,
+            datasets: [{
+                label: 'Itens por Categoria',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
         },
         options: {
-          plugins: {
-            title: {
-              display: true,
-              text: 'Distribuição de Itens no Sistema',
-              color: '#ffc107'
-            },
-            legend: { labels: { color: '#fff' } }
-          }
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribuição de Conteúdo por Categoria',
+                    color: '#ffc107'
+                }
+            }
         }
-      });
-    }
+    });
+}
 
-    // Gráfico 2: Jogos por Ano
-    const ctx2 = document.getElementById('graficoJogosPorAno');
-    if (ctx2) {
-      const contagem = {};
-      jogos.forEach(j => {
-        const ano = j.data ? j.data.substring(0, 4) : 'N/A';
-        contagem[ano] = (contagem[ano] || 0) + 1;
-      });
+function renderizarGraficoJogosPorAno() {
+    const ctx = document.getElementById('graficoJogosPorAno')?.getContext('2d');
+    if (!ctx || typeof Chart === 'undefined') return;
+    
+    const jogosPorAno = allItems
+        .filter(item => item.categoria.toLowerCase() === 'jogo' && item.data)
+        .reduce((acc, item) => {
+            const dateMatch = item.data.match(/(\d{4})/);
+            const ano = dateMatch ? dateMatch[1] : 'Desconhecido';
+            
+            acc[ano] = (acc[ano] || 0) + 1;
+            return acc;
+        }, {});
 
-      new Chart(ctx2, {
+    const labels = Object.keys(jogosPorAno).sort((a, b) => {
+        if (a === 'Desconhecido') return 1;
+        if (b === 'Desconhecido') return -1;
+        return parseInt(a) - parseInt(b);
+    });
+    const data = labels.map(ano => jogosPorAno[ano]);
+
+    new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: Object.keys(contagem),
-          datasets: [{
-            label: 'Jogos por Ano',
-            data: Object.values(contagem),
-            backgroundColor: '#ffc107'
-          }]
+            labels: labels,
+            datasets: [{
+                label: 'Quantidade de Jogos',
+                data: data,
+                backgroundColor: 'rgba(255, 165, 0, 0.8)',
+                borderColor: 'rgba(255, 165, 0, 1)',
+                borderWidth: 1
+            }]
         },
         options: {
-          scales: {
-            x: { ticks: { color: '#fff' }, grid: { color: '#333' } },
-            y: { ticks: { color: '#fff' }, grid: { color: '#333' } }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: 'Quantidade de Jogos por Ano',
-              color: '#ffc107'
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#e0e0e0',
+                        stepSize: 1 
+                    },
+                    grid: {
+                        color: 'rgba(255, 193, 7, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#e0e0e0'
+                    },
+                    grid: {
+                        color: 'rgba(255, 193, 7, 0.1)'
+                    }
+                }
             },
-            legend: { labels: { color: '#fff' } }
-          }
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Lançamento de Jogos Clássicos por Ano',
+                    color: '#ffc107'
+                }
+            }
         }
-      });
+    });
+}
+
+function showFeedback(message, isSuccess) {
+    const feedbackEl = document.getElementById('form-feedback');
+    if (feedbackEl) {
+        feedbackEl.textContent = message;
+        feedbackEl.classList.remove('d-none', 'alert-success', 'alert-danger', 'alert-warning');
+        feedbackEl.classList.add(isSuccess ? 'alert-success' : 'alert-danger');
+    }
+    setTimeout(() => {
+        feedbackEl.classList.remove('alert-success', 'alert-danger'); 
+        feedbackEl.classList.add('d-none', 'alert-warning');
+    }, 5000);
+}
+
+function handleClearForm() {
+    document.getElementById('admin-form')?.reset();
+    document.getElementById('item-id').value = ''; 
+    document.getElementById('save-button').textContent = 'Salvar Item'; 
+    showFeedback('Formulário limpo e pronto para novo cadastro.', true);
+}
+
+async function handleAdminFormSubmit(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('item-id').value;
+    const collectionName = document.getElementById('item-tipo').value;
+    const titulo = document.getElementById('item-titulo').value;
+    const descricao = document.getElementById('item-descricao').value;
+    const imagem = document.getElementById('item-imagem').value;
+    const data = document.getElementById('item-data').value;
+    const conteudo = document.getElementById('item-conteudo').value;
+    const destaque = document.getElementById('item-destaque').checked;
+
+    if (!collectionName || !titulo || !descricao || !imagem || !data || !conteudo) {
+        showFeedback('Preencha todos os campos obrigatórios!', false);
+        return;
     }
 
-  } catch (error) {
-    console.error('Erro ao montar gráficos:', error);
-    alert('Erro ao carregar dados para os gráficos: ' + error.message);
-  }
+    const itemPayload = {
+        titulo,
+        descricao,
+        imagem,
+        data,
+        conteudo,
+        destaque,
+    };
+    
+    let url = `${API_URL}/${collectionName}`;
+    let method = 'POST';
+    
+    if (id) {
+        method = 'PUT'; 
+        url = `${API_URL}/${collectionName}/${id}`;
+        itemPayload.id = id; 
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(itemPayload)
+        });
+
+        if (response.ok) {
+            const action = id ? 'editado' : 'cadastrado';
+            showFeedback(`Item ${action} com sucesso!`, true);
+            handleClearForm(); 
+            await carregarDadosGlobais(); 
+            renderizarTabelaAdmin(); 
+        } else {
+            const errorText = await response.text();
+            throw new Error(`Falha no servidor. Status: ${response.status}. Resposta: ${errorText}`);
+        }
+    } catch (error) {
+        showFeedback(`Erro: Não foi possível salvar o item. Verifique se o JSON Server está rodando.`, false);
+        console.error('Erro de CRUD:', error);
+    }
+}
+
+
+function renderizarTabelaAdmin() {
+    const tableBodyConsoles = document.getElementById('table-body-consoles');
+    const tableBodyJogos = document.getElementById('table-body-jogos');
+    const tableBodyNoticias = document.getElementById('table-body-noticias');
+
+    if (!tableBodyConsoles || !tableBodyJogos || !tableBodyNoticias) return;
+
+    tableBodyConsoles.innerHTML = '';
+    tableBodyJogos.innerHTML = '';
+    tableBodyNoticias.innerHTML = '';
+
+    allItems.forEach(item => {
+        const isDestaque = item.destaque ? 'Sim' : 'Não';
+        const itemCategoria = item.categoria.toLowerCase();
+
+        let collectionName;
+        if (itemCategoria === 'console') collectionName = 'consoles';
+        else if (itemCategoria === 'jogo') collectionName = 'jogos';
+        else if (itemCategoria === 'notícia' || itemCategoria === 'noticia') collectionName = 'noticias';
+        else return; 
+
+        const rowHTML = `
+            <tr>
+                <td>${item.id.substring(0, 4)}...</td>
+                <td>${item.titulo}</td>
+                <td>${item.descricao.substring(0, 50)}...</td>
+                <td>${isDestaque}</td>
+                <td>
+                    <button class="btn btn-sm btn-info me-2" onclick="handleEditItem('${item.id}', '${item.categoria}')">Editar</button>
+                    <button class="btn btn-sm btn-danger" onclick="handleDeleteItem('${item.id}', '${collectionName}')">Excluir</button>
+                </td>
+            </tr>
+        `;
+
+        switch (collectionName) {
+            case 'consoles':
+                tableBodyConsoles.innerHTML += rowHTML;
+                break;
+            case 'jogos':
+                tableBodyJogos.innerHTML += rowHTML;
+                break;
+            case 'noticias':
+                tableBodyNoticias.innerHTML += rowHTML;
+                break;
+        }
+    });
+}
+
+function handleEditItem(id, tipo) {
+    const item = allItems.find(i => i.id === id && i.categoria.toLowerCase() === tipo.toLowerCase());
+
+    if (!item) {
+        showFeedback('Item não encontrado para edição.', false);
+        return;
+    }
+
+    const collectionName = item.categoria.toLowerCase() + 's'; 
+
+    document.getElementById('item-id').value = item.id;
+    document.getElementById('item-tipo').value = collectionName;
+    document.getElementById('item-titulo').value = item.titulo;
+    document.getElementById('item-descricao').value = item.descricao;
+    document.getElementById('item-imagem').value = item.imagem;
+    document.getElementById('item-data').value = item.data?.split('T')[0] || ''; 
+    document.getElementById('item-conteudo').value = item.conteudo;
+    document.getElementById('item-destaque').checked = item.destaque;
+    document.getElementById('save-button').textContent = 'Salvar Alterações';
+
+    showFeedback(`Item "${item.titulo}" carregado para edição.`, true);
+    document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function handleDeleteItem(id, collectionName) {
+    if (confirm(`Tem certeza que deseja EXCLUIR o item ${id} da coleção ${collectionName}? Essa ação não pode ser desfeita.`)) {
+        try {
+            const response = await fetch(`${API_URL}/${collectionName}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showFeedback('Item excluído com sucesso! Atualizando lista.', true);
+                await carregarDadosGlobais();
+                renderizarTabelaAdmin();
+            } else {
+                const errorText = await response.text();
+                throw new Error(`Falha ao excluir item. Status: ${response.status}. Resposta: ${errorText}`);
+            }
+        } catch (error) {
+            showFeedback(`Erro ao excluir item. Consulte o console. Erro: ${error.message}`, false);
+            console.error('Erro ao excluir item:', error);
+        }
+    }
+}
+
+async function carregarDadosGlobais() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const collections = ['consoles', 'jogos', 'noticias'];
+            const fetchPromises = collections.map(collection => 
+                fetch(`${API_URL}/${collection}`).then(res => res.json())
+            );
+
+            const results = await Promise.all(fetchPromises);
+            
+            allItems = results.flatMap((items, index) => {
+                const collectionName = collections[index];
+                const categoria = collectionName.slice(0, -1); 
+                return items.map(item => ({ 
+                    ...item, 
+                    categoria: categoria.charAt(0).toUpperCase() + categoria.slice(1)
+                }));
+            });
+            
+            allItems.sort((a, b) => new Date(b.data) - new Date(a.data)); 
+            
+            resolve(allItems);
+        } catch (error) {
+            console.error('Erro ao carregar dados globais:', error);
+            if (document.getElementById('item-cards')) {
+                document.getElementById('item-cards').innerHTML = 
+                '<p class="text-center text-danger">Não foi possível carregar os dados. Certifique-se de que o JSON Server está rodando (http://localhost:3000).</p>';
+            }
+            reject(error);
+        }
+    });
+}
+
+
+function iniciarHomePage() {
+    carregarUsuario();
+    renderizarCabecalho();
+    carregarDadosGlobais().then(items => {
+        renderizarCarrossel(items);
+        renderizarCards(items);
+        // CORREÇÃO: Chamadas de estatísticas para a Home Page
+        renderizarGraficoCategoriasHome(); 
+        renderizarResumoDados();          
+    }).catch(error => {
+        console.error('Falha ao iniciar Home Page:', error);
+        alert('Não foi possível carregar o conteúdo principal. Verifique o JSON Server.');
+    });
+    setupSearchListeners();
+}
+
+function iniciarAdminPage() {
+    carregarUsuario(); 
+    renderizarCabecalho();
+
+    const adminContent = document.getElementById('admin-content');
+    const accessDenied = document.getElementById('access-denied');
+    const adminForm = document.getElementById('admin-form');
+    const clearButton = document.getElementById('clear-form-button');
+
+    if (usuarioLogado && usuarioLogado.admin) {
+        accessDenied?.classList.add('d-none');
+        adminContent?.classList.remove('d-none');
+        
+        if (adminForm) {
+            adminForm.addEventListener('submit', handleAdminFormSubmit);
+        }
+        if (clearButton) {
+            clearButton.addEventListener('click', handleClearForm);
+        }
+
+        carregarDadosGlobais().then(() => {
+             renderizarTabelaAdmin(); 
+        }).catch(error => {
+            console.error('Falha ao carregar Admin Page:', error);
+            showFeedback('Não foi possível carregar os dados. Verifique o JSON Server.', false);
+        });
+    } else {
+        accessDenied?.classList.remove('d-none');
+        adminContent?.classList.add('d-none');
+    }
+}
+
+
+function iniciarDetalhesPage() {
+    carregarUsuario();
+    renderizarCabecalho();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('id');
+    const itemType = urlParams.get('type');
+
+    if (itemId && itemType) {
+        carregarDadosGlobais().then(() => {
+            const item = allItems.find(i => i.id === itemId && i.categoria.toLowerCase() === itemType.toLowerCase());
+
+            if (item) {
+                renderizarDetalhes(item); 
+            } else {
+                const detalhesItem = document.getElementById('detalhes-item');
+                if (detalhesItem) detalhesItem.innerHTML = `<div class="alert alert-warning text-center" role="alert">Item com ID ${itemId} não encontrado.</div>`;
+            }
+        });
+    } else {
+        const detalhesItem = document.getElementById('detalhes-item');
+        if (detalhesItem) detalhesItem.innerHTML = `<div class="alert alert-danger text-center" role="alert">ID do item não especificado.</div>`;
+    }
+}
+
+
+function iniciarFavoritosPage() {
+    carregarUsuario();
+    renderizarCabecalho();
+    carregarDadosGlobais().then(() => {
+        loadAndDisplayFavorites(); 
+    }).catch(error => {
+        console.error('Falha ao iniciar Favoritos Page:', error);
+        alert('Não foi possível carregar o conteúdo. Verifique o JSON Server.');
+    });
+}
+
+
+function iniciarEstatisticasPage() {
+    carregarUsuario();
+    renderizarCabecalho();
+    carregarDadosGlobais().then(() => {
+        renderizarGraficoCategorias();
+        renderizarGraficoJogosPorAno();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.body.id === 'estatisticas-page') {
-    montarGraficos();
-  }
+    const pageId = document.body.id;
+
+    switch (pageId) {
+        case 'home-page':
+            iniciarHomePage();
+            break;
+        case 'admin-page':
+            iniciarAdminPage();
+            break;
+        case 'detalhes-page':
+            iniciarDetalhesPage();
+            break;
+        case 'favoritos-page':
+            iniciarFavoritosPage();
+            break;
+        case 'estatisticas-page':
+            iniciarEstatisticasPage();
+            break;
+        case 'login-page':
+            break;
+        default:
+            console.log("Página desconhecida ou sem inicialização específica.");
+    }
 });
