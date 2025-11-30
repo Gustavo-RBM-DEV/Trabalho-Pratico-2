@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estatísticas - Games Retrô</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body id="estatisticas-page">
+  <header class="site-header py-4 d-flex align-items-center position-relative">
+    <a href="index.html" title="Ir para a Home" class="me-3">
+      <img src="assets/img/logo.png" alt="Logo Games Retrô" style="height: 80px; width: auto;">
+    </a>
+    <h1 class="display-6 text-glow flex-grow-1 text-center m-0">Estatísticas dos Games Retrô</h1>
+    <a href="admin.html" class="btn btn-outline-warning">Gerenciar Conteúdos</a>
+     <a href="index.html" class="btn btn-outline-warning">← Voltar à Home</a>
+  </header>
+
+  <main class="container my-5">
+    <section>
+      <h2 class="section-title mb-4">Distribuição de Itens por Categoria</h2>
+      <canvas id="graficoCategorias" width="400" height="200"></canvas>
+    </section>
+
+    <hr class="border-warning my-5">
+
+    <section>
+      <h2 class="section-title mb-4">Quantidade de Jogos por Ano</h2>
+      <canvas id="graficoJogosPorAno" width="400" height="200"></canvas>
+    </section>
+  </main>
+
+  <footer class="bg-black py-3 text-center border-top border-warning">
+    <p>&copy; 2025 Games Retro. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/scripts/app.js"></script>
+</body>
+</html>

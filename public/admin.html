@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Gerenciar Conteúdos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body id="admin-page">
+  <header class="site-header py-4 d-flex align-items-center position-relative">
+    <a href="index.html" title="Ir para a Home" class="me-3">
+      <img src="assets/img/logo.png" alt="Logo Games Retrô" style="height: 80px; width: auto;">
+    </a>
+    <h1 class="display-6 text-glow flex-grow-1 text-center m-0">Painel de Administração</h1>
+    <a href="index.html" class="btn btn-outline-warning">← Voltar à Home</a>
+  </header>
+
+  <main class="container my-4">
+    <section class="mb-4">
+      <h2 class="section-title">Criar / Editar Item</h2>
+      <form id="admin-form" class="mb-3">
+        <div class="row g-2">
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Entidade</label>
+            <select id="admin-entity" class="form-select">
+              <option value="consoles">Consoles</option>
+              <option value="jogos">Jogos</option>
+              <option value="noticias">Notícias</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted">Título</label>
+            <input type="text" id="admin-titulo" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Categoria</label>
+            <select id="admin-categoria" class="form-select">
+              <option value="Console">Console</option>
+              <option value="Jogo">Jogo</option>
+              <option value="Notícia">Notícia</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label small text-muted">Data / Ano</label>
+            <input type="text" id="admin-data" class="form-control">
+          </div>
+          <div class="col-md-4 mt-2">
+            <label class="form-label small text-muted">URL da Imagem</label>
+            <input type="text" id="admin-imagem" class="form-control">
+          </div>
+          <div class="col-12 mt-2">
+            <label class="form-label small text-muted">Descrição / Conteúdo</label>
+            <textarea id="admin-descricao" class="form-control" rows="3" required></textarea>
+          </div>
+          <div class="col-md-2 mt-2 d-flex align-items-center ">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="admin-destaque">
+              <label class="form-check-label small text-muted" for="admin-destaque">Destaque</label>
+            </div>
+          </div>
+          <div class="col-12 mt-3 text-end">
+            <button id="admin-submit" type="submit" class="btn btn-outline-warning">Salvar</button>
+            <button id="admin-cancel" type="button" class="btn btn-secondary d-none">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="section-title">Registros</h2>
+      <div class="mb-4">
+        <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-consoles" data-bs-toggle="tab" data-bs-target="#pane-consoles"
+              type="button" role="tab">Consoles</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-jogos" data-bs-toggle="tab" data-bs-target="#pane-jogos" type="button"
+              role="tab">Jogos</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-noticias" data-bs-toggle="tab" data-bs-target="#pane-noticias"
+              type="button" role="tab">Notícias</button>
+          </li>
+        </ul>
+        <div class="tab-content bg-black p-3 border border-warning rounded">
+          <div class="tab-pane fade show active" id="pane-consoles" role="tabpanel">
+            <div id="table-consoles" class="table-responsive"></div>
+          </div>
+          <div class="tab-pane fade" id="pane-jogos" role="tabpanel">
+            <div id="table-jogos" class="table-responsive"></div>
+          </div>
+          <div class="tab-pane fade" id="pane-noticias" role="tabpanel">
+            <div id="table-noticias" class="table-responsive"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-black py-3 text-center border-top border-warning">
+    <p>&copy; 2025 Games Retro. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/scripts/app.js"></script>
+</body>
+
+</html>
